@@ -1,4 +1,4 @@
-const API = "http://127.0.0.1:5000";
+const API = "lee-ji-eun.up.railway.app";
 
 let userId = localStorage.getItem("user_id") || crypto.randomUUID();
 localStorage.setItem("user_id", userId);

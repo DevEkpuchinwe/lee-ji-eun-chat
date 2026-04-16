@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chinwe 💫 | Let's Create Magic Together</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .hero-bg {
+      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('https://picsum.photos/id/1015/2000/1200');
+      background-size: cover;
+      background-position: center;
+    }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2);
+    }
+  </style>
+</head>
+<body class="bg-[#0b141a] text-[#e9edef] min-h-screen">
+
+  <!-- HERO -->
+  <section class="hero-bg h-screen flex items-center justify-center text-center px-6 relative">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-6 inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-6 py-2 rounded-full text-sm">
+        <span class="text-emerald-400">●</span>
+        <span>Always ready for a good conversation</span>
+      </div>
+      
+      <h1 class="text-6xl md:text-7xl font-bold mb-4 leading-tight">
+        Hey, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">Chinwe</span> 💫
+      </h1>
+      
+      <p class="text-2xl md:text-3xl text-gray-300 mb-10">
+        Your favorite escape • Storyteller • Dream creator
+      </p>
+
+      <button onclick="window.location.href='/chat'" 
+              class="bg-white text-black font-semibold text-lg px-10 py-5 rounded-3xl hover:bg-pink-400 hover:text-white transition-all active:scale-95 shadow-xl">
+        Chat with Me Now →
+      </button>
+
+      <div class="mt-12 text-sm text-gray-400 flex items-center justify-center gap-8">
+        <div>🇳🇬 Lagos • Nigeria</div>
+        <div>24 • She/Her</div>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+      <i class="fa-solid fa-chevron-down text-3xl text-white/60"></i>
+    </div>
+  </section>
+
+  <!-- WHO AM I -->
+  <section class="py-20 px-6 max-w-5xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="text-5xl font-bold mb-6">Just a girl who loves making people smile</h2>
+        <div class="space-y-6 text-lg text-gray-300">
+          <p>
+            Hi love! I'm Chinwe — a proud Naija girl with a big heart and even bigger dreams.
+          </p>
+          <p>
+            Whether it's deep late-night talks, playful banter, sharing my favorite playlists, 
+            or helping you forget a stressful day... I'm here for it.
+          </p>
+          <p>
+            Think of me as your digital bestie who always has time for you 💕
+          </p>
+        </div>
+      </div>
+      
+      <div class="relative">
+        <img src="https://images.pexels.com/photos/33762212/pexels-photo-33762212.jpeg" 
+             alt="Chinwe smiling" 
+             class="rounded-3xl shadow-2xl w-full">
+        <div class="absolute -bottom-6 -right-6 bg-[#202c33] p-6 rounded-3xl shadow-xl max-w-[200px]">
+          <p class="italic text-sm">"Life is too short for boring conversations"</p>
+          <p class="text-right text-pink-400 mt-3">— Chinwe</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERESTS -->
+  <section class="bg-[#202c33] py-20 px-6">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-4xl font-bold text-center mb-12">Things that make me smile</h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="bg-[#0b141a] p-8 rounded-3xl text-center card-hover transition-all">
+          <i class="fa-solid fa-music text-4xl text-purple-400 mb-4"></i>
+          <h3 class="font-semibold">Afrobeats & Chill</h3>
+          <p class="text-sm text-gray-400 mt-2">Burna Boy, Wizkid, Tems... let's share playlists</p>
+        </div>
+        <div class="bg-[#0b141a] p-8 rounded-3xl text-center card-hover transition-all">
+          <i class="fa-solid fa-utensils text-4xl text-orange-400 mb-4"></i>
+          <h3 class="font-semibold">Foodie at Heart</h3>
+          <p class="text-sm text-gray-400 mt-2">Jollof wars, pepper soup & late-night snacks</p>
+        </div>
+        <div class="bg-[#0b141a] p-8 rounded-3xl text-center card-hover transition-all">
+          <i class="fa-solid fa-plane text-4xl text-sky-400 mb-4"></i>
+          <h3 class="font-semibold">Travel Addict</h3>
+          <p class="text-sm text-gray-400 mt-2">Dreaming of Santorini & Dubai sunsets</p>
+        </div>
+        <div class="bg-[#0b141a] p-8 rounded-3xl text-center card-hover transition-all">
+          <i class="fa-solid fa-heart text-4xl text-pink-400 mb-4"></i>
+          <h3 class="font-semibold">Deep Talks</h3>
+          <p class="text-sm text-gray-400 mt-2">From life goals to "what if" scenarios</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="py-20 px-6 max-w-6xl mx-auto">
+    <h2 class="text-4xl font-bold text-center mb-12">Moments from my world ✨</h2>
+    
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <img src="https://images.pexels.com/photos/33762212/pexels-photo-33762212.jpeg" class="rounded-3xl w-full aspect-[4/5] object-cover hover:scale-105 transition-transform duration-300" alt="Chinwe portrait">
+      <img src="https://images.pexels.com/photos/34249457/pexels-photo-34249457.jpeg" class="rounded-3xl w-full aspect-[4/5] object-cover hover:scale-105 transition-transform duration-300" alt="Chinwe in ankara">
+      <img src="https://picsum.photos/id/1015/800/1000" class="rounded-3xl w-full aspect-[4/5] object-cover hover:scale-105 transition-transform duration-300" alt="Fashion moment">
+      <img src="https://picsum.photos/id/201/800/1000" class="rounded-3xl w-full aspect-[4/5] object-cover hover:scale-105 transition-transform duration-300" alt="Travel vibe">
+      <img src="https://images.pexels.com/photos/33323746/pexels-photo-33323746.jpeg" class="rounded-3xl w-full aspect-[4/5] object-cover hover:scale-105 transition-transform duration-300" alt="Smiling Chinwe">
+      <img src="https://picsum.photos/id/133/800/1000" class="rounded-3xl w-full aspect-[4/5] object-cover hover:scale-105 transition-transform duration-300" alt="Lifestyle">
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="py-24 px-6 text-center bg-gradient-to-b from-transparent via-[#202c33] to-[#0b141a]">
+    <div class="max-w-xl mx-auto">
+      <h2 class="text-5xl font-bold mb-6">Ready to create our own story?</h2>
+      <p class="text-xl text-gray-400 mb-10">
+        No filters. No pressure. Just real conversations and good vibes.
+      </p>
+      <button onclick="window.location.href='/chat'" 
+              class="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold text-xl px-12 py-6 rounded-3xl hover:from-pink-600 hover:to-purple-600 transition-all active:scale-95 shadow-2xl">
+        Start Chatting with Chinwe 💬
+      </button>
+    </div>
+  </section>
+
+  <footer class="py-12 text-center text-gray-500 text-sm">
+    Made with ❤️ for unforgettable moments • I LOVE YOU TO THE MOON AND BACK 🌙
+  </footer>
+
+</body>
+</html>

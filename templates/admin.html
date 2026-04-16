@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Chinwe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-[#0b141a] text-[#e9edef] min-h-screen">
+
+  <!-- Login -->
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+    <div class="bg-gray-900 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-gray-800">
+      <div class="text-center mb-8">
+        <i class="fa-solid fa-shield-halved text-6xl text-blue-500 mb-4"></i>
+        <h1 class="text-3xl font-bold">Admin Panel</h1>
+        <p class="text-gray-400 mt-2">Enter password to continue</p>
+      </div>
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">Password</label>
+          <div class="relative">
+            <input type="password" id="pass" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 text-lg focus:outline-none focus:border-blue-500" placeholder="••••••••">
+            <button id="togglePass" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+              <i class="fa-solid fa-eye text-xl"></i>
+            </button>
+          </div>
+        </div>
+        <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-3">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Panel -->
+  <div id="panel" class="hidden flex flex-col h-screen">
+    <div class="md:hidden bg-gray-900 border-b border-gray-800 p-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-shield-halved text-2xl text-blue-500"></i>
+        <h1 class="text-xl font-bold">Admin</h1>
+      </div>
+      <button onclick="logout()" class="text-red-400"><i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
+      <!-- Sidebar -->
+      <div id="sidebar" class="w-full md:w-96 bg-[#202c33] border-r border-gray-800 flex flex-col">
+        <div class="p-5 border-b border-gray-800 flex items-center justify-between">
+          <h2 class="text-2xl font-bold">Conversations</h2>
+          <button onclick="loadConvs()" class="text-blue-400"><i class="fa-solid fa-rotate"></i></button>
+        </div>
+        <div id="convs" class="flex-1 overflow-y-auto p-4"></div>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="flex-1 flex flex-col">
+        <div class="chat-header bg-[#202c33] p-4 flex items-center justify-between border-b border-gray-800">
+          <div class="flex items-center gap-3">
+            <button onclick="backToList()" class="md:hidden text-2xl text-gray-400 mr-3">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <h2 id="chatHeader" class="font-semibold text-xl">Select conversation</h2>
+                <button onclick="renameConversation()" class="text-blue-400 hover:text-blue-300 text-sm">
+                  <i class="fa-solid fa-edit"></i>
+                </button>
+              </div>
+              <p id="chatSubheader" class="text-sm flex items-center gap-3">
+                <span id="onlineStatus" class="flex items-center gap-1 text-gray-500">● Offline</span>
+                <span id="typingStatus" class="text-blue-400 hidden">is typing...</span>
+              </p>
+            </div>
+          </div>
+          <button id="deleteBtn" onclick="deleteCurrentConversation()" class="hidden md:flex items-center gap-2 px-5 py-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 rounded-2xl">
+            <i class="fa-solid fa-trash"></i> Delete
+          </button>
+        </div>
+
+        <div id="msgs" class="flex-1 overflow-y-auto p-6 bg-[#0b141a]"></div>
+
+        <div class="bg-[#202c33] border-t border-gray-800 p-4">
+          <div id="imagePreview" class="hidden mb-4"></div>
+          <div class="flex gap-3">
+            <input id="reply" class="flex-1 bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 focus:outline-none focus:border-blue-500" placeholder="Type reply..." onkeypress="if(event.key==='Enter') sendReply()">
+            <label class="cursor-pointer w-14 h-14 flex items-center justify-center bg-gray-800 hover:bg-gray-700 rounded-3xl">
+              <i class="fa-solid fa-paperclip text-2xl"></i>
+              <input type="file" id="img" accept="image/*" class="hidden" onchange="previewImage(this)">
+            </label>
+            <button onclick="sendReply()" class="bg-blue-600 hover:bg-blue-700 w-14 h-14 rounded-3xl flex items-center justify-center">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename Modal -->
+  <div id="renameModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-gray-900 p-8 rounded-3xl w-full max-w-md">
+      <h3 class="text-xl font-bold mb-4">Rename Conversation</h3>
+      <input id="newName" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500" placeholder="New display name">
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeRenameModal()" class="flex-1 py-3 rounded-2xl border border-gray-700">Cancel</button>
+        <button onclick="saveNewName()" class="flex-1 py-3 bg-blue-600 rounded-2xl">Save Name</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden fixed bottom-6 right-6 bg-[#202c33] border border-gray-700 rounded-3xl px-6 py-4 shadow-2xl flex items-center gap-3 z-50"></div>
+
+  <script>
+    const API = "http://127.0.0.1:5000";
+    let currentConv = null;
+    let pollInterval = null;
+    let statusPoll = null;
+    let lastMsgCount = 0;
+
+    function showToast(msg, type = "success") {
+      const t = document.getElementById("toast");
+      t.innerHTML = `<i class="fa-solid ${type==='error' ? 'fa-circle-xmark text-red-400' : 'fa-circle-check text-emerald-400'}"></i><span>${msg}</span>`;
+      t.classList.remove("hidden");
+      setTimeout(() => t.classList.add("hidden"), 3000);
+    }
+
+    async function login() {
+      const pass = document.getElementById("pass").value.trim();
+      if (!pass) return showToast("Enter password", "error");
+
+      const res = await fetch(`${API}/admin/login`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({password: pass})
+      });
+
+      if (res.ok) {
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("panel").classList.remove("hidden");
+        loadConvs();
+        showToast("Logged in");
+      } else {
+        showToast("Invalid password", "error");
+      }
+    }
+
+    function logout() {
+      if (confirm("Logout?")) {
+        fetch(`${API}/admin/logout`, {method: "POST"});
+        location.reload();
+      }
+    }
+
+    async function loadConvs() {
+      const res = await fetch(`${API}/admin/conversations`);
+      const data = await res.json();
+      const container = document.getElementById("convs");
+      container.innerHTML = "";
+
+      if (!data.length) {
+        container.innerHTML = `<p class="text-center text-gray-500 py-12">No conversations yet</p>`;
+        return;
+      }
+
+      data.forEach(c => {
+        const el = document.createElement("div");
+        el.className = `p-4 rounded-2xl cursor-pointer mb-2 transition-all ${currentConv === c.id ? 'bg-gray-800 ring-2 ring-blue-500' : 'hover:bg-gray-800'}`;
+        el.innerHTML = `
+          <div class="flex justify-between items-center">
+            <div class="font-medium">${c.display_name || c.name || c.user_id}</div>
+            ${c.online ? `<span class="text-emerald-400 text-xs">● Online</span>` : `<span class="text-gray-500 text-xs">Offline</span>`}
+          </div>
+        `;
+        el.onclick = () => openChat(c.id, c.display_name || c.name || c.user_id);
+        container.appendChild(el);
+      });
+    }
+
+    function openChat(id, name) {
+      currentConv = id;
+      document.getElementById("chatHeader").textContent = name;
+      document.getElementById("deleteBtn").classList.remove("hidden");
+
+      if (window.innerWidth < 768) document.getElementById("sidebar").classList.add("hidden");
+
+      loadMsgs(id);
+
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(() => pollNewMessages(), 2500);
+
+      if (statusPoll) clearInterval(statusPoll);
+      statusPoll = setInterval(() => updateUserStatus(id), 2000);
+      updateUserStatus(id);
+    }
+
+    async function updateUserStatus(convId) {
+      try {
+        const res = await fetch(`${API}/admin/conversation_status/${convId}`);
+        const data = await res.json();
+
+        const onlineEl = document.getElementById("onlineStatus");
+        const typingEl = document.getElementById("typingStatus");
+
+        if (data.online) {
+          onlineEl.innerHTML = `<span class="text-emerald-400">● Online</span>`;
+        } else {
+          onlineEl.innerHTML = `<span class="text-gray-500">● Offline</span>`;
+        }
+
+        if (data.typing) {
+          typingEl.classList.remove("hidden");
+        } else {
+          typingEl.classList.add("hidden");
+        }
+      } catch (e) {}
+    }
+
+    async function renameConversation() {
+      if (!currentConv) return;
+      document.getElementById("renameModal").classList.remove("hidden");
+      document.getElementById("newName").focus();
+    }
+
+    function closeRenameModal() {
+      document.getElementById("renameModal").classList.add("hidden");
+    }
+
+    async function saveNewName() {
+      const newName = document.getElementById("newName").value.trim();
+      if (!newName || !currentConv) return;
+
+      const res = await fetch(`${API}/admin/rename_conversation/${currentConv}`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({display_name: newName})
+      });
+
+      if (res.ok) {
+        showToast("Conversation renamed");
+        closeRenameModal();
+        loadConvs();
+        // Refresh current header
+        document.getElementById("chatHeader").textContent = newName;
+      } else {
+        showToast("Failed to rename", "error");
+      }
+    }
+
+    // Rest of the functions (loadMsgs, sendReply, previewImage, etc.) remain the same as previous version
+    async function loadMsgs(id) {
+      const res = await fetch(`${API}/admin/messages/${id}`);
+      const msgs = await res.json();
+      const container = document.getElementById("msgs");
+      container.innerHTML = "";
+
+      msgs.forEach(m => {
+        const isAdmin = m.sender === "owner";
+        const row = document.createElement("div");
+        row.className = `message-row ${isAdmin ? 'admin' : 'user'}`;
+        row.innerHTML = `
+          <div class="msg-bubble">
+            ${m.message ? `<p>${m.message}</p>` : ''}
+            ${m.image_url ? `<img src="${m.image_url}" alt="image">` : ''}
+            <span class="msg-time">${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+      container.scrollTop = container.scrollHeight;
+      lastMsgCount = msgs.length;
+    }
+
+    async function pollNewMessages() {
+      if (!currentConv) return;
+      const res = await fetch(`${API}/admin/messages/${currentConv}`);
+      const msgs = await res.json();
+      if (msgs.length > lastMsgCount) loadMsgs(currentConv);
+    }
+
+    async function sendReply() {
+      if (!currentConv) return showToast("Select a chat first", "error");
+      const text = document.getElementById("reply").value.trim();
+      const file = document.getElementById("img").files[0];
+
+      if (!text && !file) return showToast("Type something or attach image", "error");
+
+      const form = new FormData();
+      form.append("conversation_id", currentConv);
+      if (text) form.append("message", text);
+      if (file) form.append("image", file);
+
+      const res = await fetch(`${API}/admin/send`, {method: "POST", body: form});
+      if (res.ok) {
+        document.getElementById("reply").value = "";
+        removeImagePreview();
+        loadMsgs(currentConv);
+        showToast("Sent");
+      }
+    }
+
+    function previewImage(input) {
+      const preview = document.getElementById("imagePreview");
+      preview.innerHTML = "";
+      preview.classList.add("hidden");
+      if (input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.innerHTML = `<div class="flex gap-4 bg-gray-800 p-3 rounded-2xl"><img src="${e.target.result}" class="h-20 rounded-xl"><button onclick="removeImagePreview()" class="text-red-400"><i class="fa-solid fa-xmark"></i></button></div>`;
+          preview.classList.remove("hidden");
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function removeImagePreview() {
+      document.getElementById("img").value = "";
+      document.getElementById("imagePreview").classList.add("hidden");
+    }
+
+    async function deleteCurrentConversation() {
+      if (!currentConv || !confirm("Delete this conversation?")) return;
+      await fetch(`${API}/admin/delete_conversation/${currentConv}`, {method: "DELETE"});
+      showToast("Conversation deleted");
+      currentConv = null;
+      document.getElementById("msgs").innerHTML = "";
+      loadConvs();
+    }
+
+    function backToList() {
+      document.getElementById("sidebar").classList.remove("hidden");
+      if (statusPoll) clearInterval(statusPoll);
+      statusPoll = null;
+    }
+
+    // Password toggle
+    document.getElementById("togglePass").addEventListener("click", function() {
+      const input = document.getElementById("pass");
+      const icon = this.querySelector("i");
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace("fa-eye", "fa-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.replace("fa-eye-slash", "fa-eye");
+      }
+    });
+
+    window.onload = async () => {
+      const res = await fetch(`${API}/admin/check`);
+      if (res.ok) {
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("panel").classList.remove("hidden");
+        loadConvs();
+      }
+    };
+  </script>
+</body>
+</html>

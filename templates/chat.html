@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with Chinwe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body {
+      background: #0b141a;
+      color: #e9edef;
+    }
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #0b141a;
+    }
+    .message-row {
+      display: flex;
+      width: 100%;
+    }
+    .message-row.user { justify-content: flex-end; }     /* Customer messages - RIGHT */
+    .message-row.chinwe { justify-content: flex-start; } /* Chinwe messages - LEFT */
+
+    .msg-bubble {
+      max-width: 78%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      word-wrap: break-word;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      font-size: 15.5px;
+    }
+    .message-row.user .msg-bubble {
+      background: #005c4b;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .message-row.chinwe .msg-bubble {
+      background: #202c33;
+      color: white;
+      border-bottom-left-radius: 4px;
+    }
+    .msg-bubble img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin: 8px 0 4px 0;
+    }
+    .msg-time {
+      font-size: 12px;
+      opacity: 0.75;
+      margin-top: 6px;
+      display: block;
+      text-align: right;
+    }
+    .chat-input-area {
+      background: #202c33;
+      padding: 12px 16px;
+      border-top: 1px solid #2a3942;
+    }
+    #imagePreview {
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <div class="chat-header flex items-center justify-between px-4 py-4 border-b border-gray-800 bg-[#202c33]">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+        C
+      </div>
+      <div>
+        <strong class="text-lg">Chinwe</strong>
+        <div class="flex items-center gap-1 text-sm">
+          <span id="status" class="text-emerald-400">● Online</span>
+        </div>
+      </div>
+    </div>
+    <button onclick="window.location.href='/'" class="text-gray-400 hover:text-white">
+      <i class="fa-solid fa-house"></i>
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div id="messages" class="flex-1"></div>
+
+  <!-- Typing Indicator -->
+  <div id="typing" class="px-6 py-2 text-sm text-gray-400 hidden">
+    Chinwe is typing...
+  </div>
+
+  <!-- Input Area -->
+  <div class="chat-input-area">
+    <div id="imagePreview" class="hidden"></div>
+    
+    <form id="chatForm" class="flex gap-3 items-end">
+      <label class="cursor-pointer flex-shrink-0 w-11 h-11 flex items-center justify-center text-2xl text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors">
+        <i class="fa-solid fa-paperclip"></i>
+        <input type="file" id="image" accept="image/*" class="hidden" onchange="previewImage(this)">
+      </label>
+
+      <input id="msg" 
+             type="text" 
+             class="flex-1 bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 focus:outline-none focus:border-blue-500 text-base"
+             placeholder="Type a message..." 
+             autocomplete="off">
+
+      <button type="submit"
+              class="flex-shrink-0 w-11 h-11 bg-blue-600 hover:bg-blue-700 rounded-3xl flex items-center justify-center text-white transition-all active:scale-95">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </form>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:5000";
+    let convId = localStorage.getItem("conv_id");
+    let userId = localStorage.getItem("user_id") || crypto.randomUUID();
+    localStorage.setItem("user_id", userId);
+
+    let pollInterval = null;
+
+    async function initConversation() {
+      if (!convId) {
+        const name = prompt("Enter your name to start chatting with Chinwe") || "Guest";
+        
+        const res = await fetch(`${API}/start`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, name })
+        });
+
+        const data = await res.json();
+        convId = data.id;
+        localStorage.setItem("conv_id", convId);
+      }
+      loadMessages();
+      pollInterval = setInterval(loadMessages, 2000);
+    }
+
+    async function loadMessages() {
+      if (!convId) return;
+
+      try {
+        const res = await fetch(`${API}/messages/${convId}`);
+        const messages = await res.json();
+
+        const container = document.getElementById("messages");
+        container.innerHTML = "";
+
+        messages.forEach(m => {
+          const isUser = m.sender === "user";
+          const row = document.createElement("div");
+          row.className = `message-row ${isUser ? 'user' : 'chinwe'}`;
+
+          row.innerHTML = `
+            <div class="msg-bubble">
+              ${m.message ? `<p>${m.message}</p>` : ''}
+              ${m.image_url ? `<img src="${m.image_url}" alt="image">` : ''}
+              <span class="msg-time">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+          `;
+          container.appendChild(row);
+        });
+
+        container.scrollTop = container.scrollHeight;
+      } catch (e) {
+        console.error("Failed to load messages");
+      }
+    }
+
+    // Image Preview
+    function previewImage(input) {
+      const preview = document.getElementById("imagePreview");
+      preview.innerHTML = "";
+      preview.classList.add("hidden");
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.innerHTML = `
+            <div class="flex items-center gap-3 bg-gray-800 p-3 rounded-2xl">
+              <img src="${e.target.result}" class="h-20 rounded-xl object-cover">
+              <button onclick="removePreview()" class="text-red-400 hover:text-red-300 p-1">
+                <i class="fa-solid fa-xmark text-xl"></i>
+              </button>
+            </div>
+          `;
+          preview.classList.remove("hidden");
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function removePreview() {
+      document.getElementById("image").value = "";
+      document.getElementById("imagePreview").classList.add("hidden");
+    }
+
+    // Send Message
+    document.getElementById("chatForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const messageInput = document.getElementById("msg");
+      const fileInput = document.getElementById("image");
+
+      const message = messageInput.value.trim();
+      const file = fileInput.files[0];
+
+      if (!message && !file) return;
+
+      const formData = new FormData();
+      formData.append("conversation_id", convId);
+      if (message) formData.append("message", message);
+      if (file) formData.append("image", file);
+
+      try {
+        const res = await fetch(`${API}/send`, {
+          method: "POST",
+          body: formData
+        });
+
+        if (res.ok) {
+          messageInput.value = "";
+          removePreview();
+          loadMessages();
+        }
+      } catch (err) {
+        alert("Failed to send message");
+      }
+    });
+
+    // Keyboard support (Enter to send)
+    document.getElementById("msg").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        document.getElementById("chatForm").dispatchEvent(new Event("submit"));
+      }
+    });
+
+    // Initialize
+    window.onload = initConversation;
+
+    // Cleanup on page unload
+    window.onbeforeunload = () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+
+// Add these functions
+async function updateUserStatus(isOnline) {
+  if (!convId) return;
+  await fetch(`${API}/update_status`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ conversation_id: convId, online: isOnline })
+  });
+}
+
+let typingTimeout;
+document.getElementById("msg").addEventListener("input", () => {
+  if (!convId) return;
+  fetch(`${API}/set_typing`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ conversation_id: convId, typing: true })
+  });
+
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    fetch(`${API}/set_typing`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ conversation_id: convId, typing: false })
+    });
+  }, 1800);
+});
+
+// Update onload and beforeunload
+window.onload = () => {
+  updateUserStatus(true);
+  initConversation();
+};
+
+window.onbeforeunload = () => {
+  updateUserStatus(false);
+};
+
+
+  </script>
+</body>
+</html>

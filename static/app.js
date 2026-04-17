@@ -1,4 +1,4 @@
-const API = "lee-ji-eun.up.railway.app";
+const API = "https://lee-ji-eun.up.railway.app";
 
 let userId = localStorage.getItem("user_id") || crypto.randomUUID();
 localStorage.setItem("user_id", userId);

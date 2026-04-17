@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat with Chinwe</title>
+  <title>Chat with Lee Ji-eun </title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <link rel="stylesheet" href="/static/style.css">
@@ -26,7 +26,7 @@
       width: 100%;
     }
     .message-row.user { justify-content: flex-end; }     /* Customer messages - RIGHT */
-    .message-row.chinwe { justify-content: flex-start; } /* Chinwe messages - LEFT */
+    .message-row.Lee Ji-eun  { justify-content: flex-start; } /* Lee Ji-eun  messages - LEFT */
 
     .msg-bubble {
       max-width: 78%;
@@ -41,7 +41,7 @@
       color: white;
       border-bottom-right-radius: 4px;
     }
-    .message-row.chinwe .msg-bubble {
+    .message-row.Lee Ji-eun  .msg-bubble {
       background: #202c33;
       color: white;
       border-bottom-left-radius: 4px;
@@ -72,28 +72,34 @@
 
   <!-- Header -->
   <div class="chat-header flex items-center justify-between px-4 py-4 border-b border-gray-800 bg-[#202c33]">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-        C
-      </div>
-      <div>
-        <strong class="text-lg">Chinwe</strong>
-        <div class="flex items-center gap-1 text-sm">
-          <span id="status" class="text-emerald-400">● Online</span>
-        </div>
+  <div class="flex items-center gap-3">
+    
+    <!-- Profile Image -->
+    <img 
+      src="https://i.pinimg.com/originals/16/0d/82/160d82b945290ffb61372982fb4f6f68.jpg?w=200&h=200&fit=crop" 
+      alt="Lee Ji-eun"
+      class="w-10 h-10 rounded-full object-cover border border-gray-700"
+    >
+
+    <div>
+      <strong class="text-lg">Lee Ji-eun</strong>
+      <div class="flex items-center gap-1 text-sm">
+        <span id="status" class="text-emerald-400">● Online</span>
       </div>
     </div>
-    <button onclick="window.location.href='/'" class="text-gray-400 hover:text-white">
-      <i class="fa-solid fa-house"></i>
-    </button>
   </div>
+
+  <button onclick="window.location.href='/'" class="text-gray-400 hover:text-white">
+    <i class="fa-solid fa-house"></i>
+  </button>
+</div>
 
   <!-- Messages -->
   <div id="messages" class="flex-1"></div>
 
   <!-- Typing Indicator -->
   <div id="typing" class="px-6 py-2 text-sm text-gray-400 hidden">
-    Chinwe is typing...
+    Lee Ji-eun  is typing...
   </div>
 
   <!-- Input Area -->
@@ -129,7 +135,7 @@
 
     async function initConversation() {
       if (!convId) {
-        const name = prompt("Enter your name to start chatting with Chinwe") || "Guest";
+        const name = prompt("Enter your name to start chatting with Lee Ji-eun ") || "Guest";
         
         const res = await fetch(`${API}/start`, {
           method: "POST",
@@ -158,7 +164,7 @@
         messages.forEach(m => {
           const isUser = m.sender === "user";
           const row = document.createElement("div");
-          row.className = `message-row ${isUser ? 'user' : 'chinwe'}`;
+          row.className = `message-row ${isUser ? 'user' : 'Lee Ji-eun '}`;
 
           row.innerHTML = `
             <div class="msg-bubble">

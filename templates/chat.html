@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat with Lee Ji-eun </title>
+  <title>Chat with Lee Ji-eun</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <link rel="stylesheet" href="/static/style.css">
@@ -12,21 +12,24 @@
       background: #0b141a;
       color: #e9edef;
     }
+
+    /* Messages Container */
     #messages {
       flex: 1;
       overflow-y: auto;
-      padding: 20px 16px;
+      padding: 20px 16px 100px;   /* Extra bottom padding so last message is visible */
       display: flex;
       flex-direction: column;
       gap: 16px;
       background: #0b141a;
     }
+
     .message-row {
       display: flex;
       width: 100%;
     }
-    .message-row.user { justify-content: flex-end; }     /* Customer messages - RIGHT */
-    .message-row.Lee Ji-eun  { justify-content: flex-start; } /* Lee Ji-eun  messages - LEFT */
+    .message-row.user { justify-content: flex-end; }      /* User messages - RIGHT */
+    .message-row.other { justify-content: flex-start; }   /* Lee Ji-eun messages - LEFT */
 
     .msg-bubble {
       max-width: 78%;
@@ -41,7 +44,7 @@
       color: white;
       border-bottom-right-radius: 4px;
     }
-    .message-row.Lee Ji-eun  .msg-bubble {
+    .message-row.other .msg-bubble {
       background: #202c33;
       color: white;
       border-bottom-left-radius: 4px;
@@ -58,13 +61,18 @@
       display: block;
       text-align: right;
     }
+
+    /* Fixed Input Area */
     .chat-input-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
       background: #202c33;
-      padding: 12px 16px;
       border-top: 1px solid #2a3942;
-    }
-    #imagePreview {
-      margin-bottom: 12px;
+      padding: 12px 16px;
+      z-index: 50;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
@@ -72,39 +80,36 @@
 
   <!-- Header -->
   <div class="chat-header flex items-center justify-between px-4 py-4 border-b border-gray-800 bg-[#202c33]">
-  <div class="flex items-center gap-3">
-    
-    <!-- Profile Image -->
-    <img 
-      src="https://i.pinimg.com/originals/16/0d/82/160d82b945290ffb61372982fb4f6f68.jpg?w=200&h=200&fit=crop" 
-      alt="Lee Ji-eun"
-      class="w-10 h-10 rounded-full object-cover border border-gray-700"
-    >
-
-    <div>
-      <strong class="text-lg">Lee Ji-eun</strong>
-      <div class="flex items-center gap-1 text-sm">
-        <span id="status" class="text-emerald-400">● Online</span>
+    <div class="flex items-center gap-3">
+      <img 
+        src="https://i.pinimg.com/originals/16/0d/82/160d82b945290ffb61372982fb4f6f68.jpg" 
+        alt="Lee Ji-eun"
+        class="w-10 h-10 rounded-full object-cover border border-gray-700"
+      >
+      <div>
+        <strong class="text-lg">Lee Ji-eun</strong>
+        <div class="flex items-center gap-1 text-sm">
+          <span id="status" class="text-emerald-400">● Online</span>
+        </div>
       </div>
     </div>
+
+    <button onclick="window.location.href='/'" class="text-gray-400 hover:text-white">
+      <i class="fa-solid fa-house"></i>
+    </button>
   </div>
 
-  <button onclick="window.location.href='/'" class="text-gray-400 hover:text-white">
-    <i class="fa-solid fa-house"></i>
-  </button>
-</div>
-
-  <!-- Messages -->
+  <!-- Messages Area -->
   <div id="messages" class="flex-1"></div>
 
   <!-- Typing Indicator -->
-  <div id="typing" class="px-6 py-2 text-sm text-gray-400 hidden">
-    Lee Ji-eun  is typing...
+  <div id="typing" class="px-6 py-2 text-sm text-gray-400 hidden fixed bottom-20 left-0 right-0 bg-[#0b141a] z-40">
+    Lee Ji-eun is typing...
   </div>
 
-  <!-- Input Area -->
+  <!-- Fixed Input Area -->
   <div class="chat-input-area">
-    <div id="imagePreview" class="hidden"></div>
+    <div id="imagePreview" class="hidden mb-3"></div>
     
     <form id="chatForm" class="flex gap-3 items-end">
       <label class="cursor-pointer flex-shrink-0 w-11 h-11 flex items-center justify-center text-2xl text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors">
@@ -135,7 +140,7 @@
 
     async function initConversation() {
       if (!convId) {
-        const name = prompt("Enter your name to start chatting with Lee Ji-eun ") || "Guest";
+        const name = prompt("Enter your name to start chatting with Lee Ji-eun") || "Guest";
         
         const res = await fetch(`${API}/start`, {
           method: "POST",
@@ -164,7 +169,7 @@
         messages.forEach(m => {
           const isUser = m.sender === "user";
           const row = document.createElement("div");
-          row.className = `message-row ${isUser ? 'user' : 'Lee Ji-eun '}`;
+          row.className = `message-row ${isUser ? 'user' : 'other'}`;
 
           row.innerHTML = `
             <div class="msg-bubble">
@@ -250,54 +255,45 @@
       }
     });
 
-    // Initialize
-    window.onload = initConversation;
+    // Online & Typing Status
+    async function updateUserStatus(isOnline) {
+      if (!convId) return;
+      await fetch(`${API}/update_status`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ conversation_id: convId, online: isOnline })
+      });
+    }
 
-    // Cleanup on page unload
-    window.onbeforeunload = () => {
-      if (pollInterval) clearInterval(pollInterval);
+    let typingTimeout;
+    document.getElementById("msg").addEventListener("input", () => {
+      if (!convId) return;
+      fetch(`${API}/set_typing`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ conversation_id: convId, typing: true })
+      });
+
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        fetch(`${API}/set_typing`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ conversation_id: convId, typing: false })
+        });
+      }, 1800);
+    });
+
+    // Initialize
+    window.onload = () => {
+      updateUserStatus(true);
+      initConversation();
     };
 
-// Add these functions
-async function updateUserStatus(isOnline) {
-  if (!convId) return;
-  await fetch(`${API}/update_status`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ conversation_id: convId, online: isOnline })
-  });
-}
-
-let typingTimeout;
-document.getElementById("msg").addEventListener("input", () => {
-  if (!convId) return;
-  fetch(`${API}/set_typing`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ conversation_id: convId, typing: true })
-  });
-
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => {
-    fetch(`${API}/set_typing`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ conversation_id: convId, typing: false })
-    });
-  }, 1800);
-});
-
-// Update onload and beforeunload
-window.onload = () => {
-  updateUserStatus(true);
-  initConversation();
-};
-
-window.onbeforeunload = () => {
-  updateUserStatus(false);
-};
-
-
+    window.onbeforeunload = () => {
+      updateUserStatus(false);
+      if (pollInterval) clearInterval(pollInterval);
+    };
   </script>
 </body>
 </html>
